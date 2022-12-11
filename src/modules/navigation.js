@@ -1,6 +1,8 @@
 import { access, readdir } from "node:fs/promises"
 import { resolve } from "path"
 
+import { InputError } from "./errors.js"
+
 export async function up(workingDirectory) {
   const resolvedPath = resolve(workingDirectory, "../")
 
@@ -9,7 +11,13 @@ export async function up(workingDirectory) {
   return resolvedPath
 }
 
-export async function cd(workingDirectory, path) {
+export async function cd(workingDirectory, args) {
+  const path = args[0]
+
+  if (!path) {
+    throw new InputError()
+  }
+
   const resolvedPath = resolve(workingDirectory, path)
 
   await access(resolvedPath)

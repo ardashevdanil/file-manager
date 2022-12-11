@@ -8,6 +8,7 @@ export function getUsername() {
   }, "")
 
   if (username) {
+    console.log(`Welcome to the File Manager, ${username}!`)
     return username
   } else {
     throw new Error("Provide username")
