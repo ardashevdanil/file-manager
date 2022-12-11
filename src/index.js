@@ -1,15 +1,15 @@
 import path from "path"
 
 import { getUsername } from "./modules/username.js"
+import { up, cd, ls } from "./modules/navigation.js"
 
 const NAVIGATION_COMMANDS_MAP = {
-  "up": () => "up",
-  "cd": () => "cd",
+  "up": up,
+  "cd": cd,
 }
 
 const COMMANDS_MAP = {
-  "ls": () => "ls",
-  "ls": () => "ls",
+  "ls": ls,
   "cat": () => "cat",
   "rn": () => "rn",
   "cp": () => "cp",
@@ -24,14 +24,22 @@ const COMMANDS_MAP = {
 const username = getUsername()
 let workingDirectory = path.resolve()
 
-process.stdin.on("data", (data) => {
-  const commandName = data.toString().trim().split(" ")[0]
-  const command = COMMANDS_MAP[commandName] || NAVIGATION_COMMANDS_MAP[commandName]
-  let output = "Invalid input"
+process.stdin.on("data", async (data) => {
+  const [commandName, args] = data.toString().trim().split(" ")
+  const commonCommand = COMMANDS_MAP[commandName]
+  const navigationCommand = NAVIGATION_COMMANDS_MAP[commandName]
 
-  if (command) {
-    output = command(data.toString(), workingDirectory)
+  try {
+    if (commonCommand) {
+      await commonCommand(workingDirectory, args)
+    }
+
+    if (navigationCommand) {
+      workingDirectory = await navigationCommand(workingDirectory, args)
+    }
+
+    console.log("You are currently in " + workingDirectory )
+  } catch (err) {
+    console.log(`Operation failed: ${err.message}`)
   }
-
-  process.stdout.write(output + "\n" + "You are currently in " + workingDirectory + "\n")
 })
