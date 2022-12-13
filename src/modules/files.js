@@ -5,7 +5,7 @@ import { resolve } from "path"
 
 import { InputError } from "./errors.js"
 
-export function cat(workingDirectory, args) {
+export async function cat(workingDirectory, args) {
   const path = args[0]
 
   if (!path) {
