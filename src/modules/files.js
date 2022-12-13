@@ -4,7 +4,7 @@ import { resolve } from "path"
 
 import { InputError } from "./errors.js"
 
-export async function cat(workingDirectory, args) {
+export function cat(workingDirectory, args) {
   const path = args[0]
 
   if (!path) {
@@ -13,12 +13,11 @@ export async function cat(workingDirectory, args) {
 
   const readStream = createReadStream(resolve(workingDirectory, path))
 
-  // Async pipeline doesn't exit from process.stdout
   return new Promise((resolve, reject) => {
     readStream
       .on("data", data => process.stdout.write(data))
       .on("end", resolve)
-      .on("error", err => reject(err))
+      .on("error", reject)
   })
 };
 
@@ -45,7 +44,7 @@ export async function rn(workingDirectory, args) {
   )
 }
 
-export async function cp(workingDirectory, args) {
+export function cp(workingDirectory, args) {
   if (args.length !== 2) {
     throw new InputError()
   }
@@ -54,7 +53,12 @@ export async function cp(workingDirectory, args) {
   const readStream = createReadStream(resolve(workingDirectory, path))
   const writeStream = createWriteStream(resolve(workingDirectory, newPath, path))
 
-  await pipeline(readStream, writeStream)
+  return new Promise((resolve, reject) => {
+    readStream
+      .on("data", data => writeStream.write(data))
+      .on("end", resolve)
+      .on("error", reject)
+  })
 }
 
 export async function rm(workingDirectory, args) {
