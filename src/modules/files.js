@@ -1,6 +1,5 @@
 import { createReadStream, createWriteStream } from "node:fs"
 import { appendFile, rm as fsRm, rename } from "node:fs/promises"
-import { pipeline } from "node:stream/promises"
 import { resolve } from "path"
 
 import { InputError } from "./errors.js"
