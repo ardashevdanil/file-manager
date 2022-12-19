@@ -54,6 +54,7 @@ export function cp(workingDirectory, args) {
   const writeStream = createWriteStream(resolve(workingDirectory, newPath, path))
 
   return new Promise((resolve, reject) => {
+    writeStream.on("error", reject)
     readStream
       .on("data", data => writeStream.write(data))
       .on("end", resolve)
